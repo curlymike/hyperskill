@@ -18,4 +18,14 @@ public class MiniMaxTest {
         assertThat(MiniMax.compute(field, X)).isEqualTo(10);
     }
 
+    @Test
+    public void compute_002() {
+        int[][] field = {
+                {O, 0, X},
+                {X, 0, X},
+                {0, O, O},
+        };
+        assertThat(MiniMax.compute(field, X)).isEqualTo(10);
+    }
+
 }
