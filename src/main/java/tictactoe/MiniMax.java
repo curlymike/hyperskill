@@ -17,6 +17,7 @@ public enum MiniMax {
         return compute(field, player, miniMax, 0);
     }
 
+    // TODO: Choose randomly between moves with the same weight
     public static Result compute(int[][] field, int player, MiniMax miniMax, int depth) {
         Cell cell = null;
         int largestScoreValue = miniMax == MAX ? Integer.MIN_VALUE : Integer.MAX_VALUE;
@@ -26,19 +27,18 @@ public enum MiniMax {
             field[freeCell.y][freeCell.x] = player;
             if (isWinner(field, player) > 0) {
                 value = miniMax == MAX ? 10 : -10;
-                //scoreSum += value;
+                scoreSum += value;
             } else if (!hasFreeCells(field)) {
                 value = 0;
             } else {
                 Result result = compute(field, opponent(player), inverse(miniMax), depth + 1);
-                value = result.score;
-                //scoreSum += result.scoreSum;
+                value = result.scoreSum;
+                scoreSum += result.scoreSum;
             }
             if (miniMax == MAX && value > largestScoreValue || miniMax == MIN && value < largestScoreValue) {
                 largestScoreValue = value;
                 cell = freeCell;
             }
-            scoreSum += largestScoreValue;
             field[freeCell.y][freeCell.x] = 0;
         }
         return new Result(largestScoreValue, cell, scoreSum);

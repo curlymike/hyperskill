@@ -121,4 +121,15 @@ public class MiniMaxTest {
         assertThat(result.getCell()).isEqualTo(new Main.Cell(0, 2));
     }
 
+    @Test
+    public void compute_200() {
+        int[][] field = {
+                {O, O, X},
+                {0, 0, 0},
+                {X, 0, 0},
+        };
+        MiniMax.Result result = compute(field, X);
+        assertThat(result.getCell()).isEqualTo(new Main.Cell(1, 1));
+    }
+
 }
