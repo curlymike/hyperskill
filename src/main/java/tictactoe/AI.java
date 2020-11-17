@@ -13,6 +13,7 @@ public class AI extends AbstractPlayer implements Player {
         this.level = level;
         switch (level) {
             case MEDIUM: strategy = new MediumStrategy(); break;
+            case HARD: strategy = new HardStrategy(); break;
             default: strategy = new EasyStrategy();
         }
     }
