@@ -1,7 +1,6 @@
 package tictactoe;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static tictactoe.Main.isWinner;
 import static tictactoe.Main.opponent;
@@ -11,56 +10,40 @@ import static tictactoe.Main.Cell;
 
 public enum MiniMax {
     MIN, MAX;
+
     public static int compute(int[][] field, int player) {
         return compute(field, player, MAX, 0);
-        //return compute(field, player, MAX);
+    }
+
+    public static int compute(int[][] field, int player, MiniMax miniMax) {
+        return compute(field, player, miniMax, 0);
     }
 
     public static int compute(int[][] field, int player, MiniMax miniMax, int depth) {
+        if (isWinner(field, player) > 0) {
+            return miniMax == MAX ? 10 : -10;
+        }
+        if (!hasFreeCells(field)) {
+            return 0;
+        }
         if (depth > 0) {
-            if (isWinner(field, player) > 0) {
-                return miniMax == MAX ? 10 : -10;
-            }
-//            if (isWinner(field, opponent(player)) > 0) {
-//                return -10;
-//            }
-            if (!hasFreeCells(field)) {
-                return 0;
-            }
             player = opponent(player);
             miniMax = inverse(miniMax);
         }
 
-        Map<Cell, Integer> map = new HashMap<>();
+        List<Integer> scores = new ArrayList<>();
 
-        for (Cell cell : freeCells(field)) {
-            field[cell.y][cell.x] = player;
-            map.put(cell, compute(field, player, miniMax, depth + 1));
-            //map.put(cell, compute(field, player, miniMax));
-            field[cell.y][cell.x] = 0;
+        for (Cell freeCell : freeCells(field)) {
+            field[freeCell.y][freeCell.x] = player;
+            scores.add(compute(field, player, miniMax, depth + 1));
+            field[freeCell.y][freeCell.x] = 0;
         }
 
-        Cell cell = null;
         int value;
         if (miniMax == MAX) {
-            value = Integer.MIN_VALUE;
-            for (Map.Entry<Cell, Integer> pair : map.entrySet()) {
-                if (pair.getValue() > value) {
-                    value = pair.getValue();
-                    cell = pair.getKey();
-                }
-            }
+            value = Collections.max(scores);
         } else {
-            value = Integer.MAX_VALUE;
-            for (Map.Entry<Cell, Integer> pair : map.entrySet()) {
-                if (pair.getValue() < value) {
-                    value = pair.getValue();
-                    cell = pair.getKey();
-                }
-            }
-        }
-        if (depth == 0) {
-            System.out.println(cell);
+            value = Collections.min(scores);
         }
         return value;
     }
