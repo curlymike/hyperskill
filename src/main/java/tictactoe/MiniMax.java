@@ -20,23 +20,28 @@ public enum MiniMax {
     public static Result compute(int[][] field, int player, MiniMax miniMax, int depth) {
         Cell cell = null;
         int largestScoreValue = miniMax == MAX ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+        int scoreSum = 0;
         for (Cell freeCell : freeCells(field)) {
             int value;
             field[freeCell.y][freeCell.x] = player;
             if (isWinner(field, player) > 0) {
                 value = miniMax == MAX ? 10 : -10;
+                //scoreSum += value;
             } else if (!hasFreeCells(field)) {
                 value = 0;
             } else {
-                value = compute(field, opponent(player), inverse(miniMax), depth + 1).score;
+                Result result = compute(field, opponent(player), inverse(miniMax), depth + 1);
+                value = result.score;
+                //scoreSum += result.scoreSum;
             }
             if (miniMax == MAX && value > largestScoreValue || miniMax == MIN && value < largestScoreValue) {
                 largestScoreValue = value;
                 cell = freeCell;
             }
+            scoreSum += largestScoreValue;
             field[freeCell.y][freeCell.x] = 0;
         }
-        return new Result(largestScoreValue, cell);
+        return new Result(largestScoreValue, cell, scoreSum);
     }
 
     private static MiniMax inverse(MiniMax miniMax) {
@@ -49,19 +54,34 @@ public enum MiniMax {
 
     public static class Result {
         private final int score;
+        private final int scoreSum;
         private final Cell cell;
 
-        public Result(int score, Cell cell) {
+        public Result(int score, Cell cell, int scoreSum) {
             this.score = score;
             this.cell = cell;
+            this.scoreSum = scoreSum;
         }
 
         public int getScore() {
             return score;
         }
 
+        public int getScoreSum() {
+            return scoreSum;
+        }
+
         public Cell getCell() {
             return cell;
+        }
+
+        @Override
+        public String toString() {
+            return "Result{" +
+                    "score=" + score +
+                    ", scoreSum=" + scoreSum +
+                    ", cell=" + cell +
+                    '}';
         }
     }
 
