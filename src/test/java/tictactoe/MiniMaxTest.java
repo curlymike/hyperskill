@@ -8,6 +8,13 @@ import static tictactoe.Main.O;
 
 public class MiniMaxTest {
 
+    public static MiniMax.Result compute(int[][] field, int player) {
+        return MiniMax.compute(field, player);
+    }
+    public static MiniMax.Result compute(int[][] field, int player, MiniMax miniMax) {
+        return MiniMax.compute(field, player, miniMax);
+    }
+
     @Test
     public void compute_001() {
         int[][] field = {
@@ -15,7 +22,44 @@ public class MiniMaxTest {
                 {X, 0, X},
                 {0, O, O},
         };
-        assertThat(MiniMax.compute(field, X)).isEqualTo(10);
+        assertThat(compute(field, X).getScore()).isEqualTo(10);
+        assertThat(compute(field, X).getCell()).isEqualTo(new Main.Cell(1, 1));
+    }
+
+    @Test
+    public void compute_001_1() {
+        int[][] field = {
+                {O, X, 0},
+                {X, O, 0},
+                {O, 0, X},
+        };
+//        int[][] field = {
+//                {O, X, X},
+//                {X, O, O},
+//                {O, 0, X},
+//        };
+//        int[][] field = {
+//                {O, X, 0},
+//                {X, O, O},
+//                {O, X, X},
+//        };
+        //field[2][1] = X;
+        MiniMax.Result result = compute(field, X);
+        assertThat(result.getScore()).isEqualTo(0);
+        assertThat(result.getCell()).isEqualTo(new Main.Cell(0, 2));
+    }
+
+    @Test
+    public void compute_001_2() {
+        int[][] field = {
+                {O, X, 0},
+                {X, O, 0},
+                {O, 0, X},
+        };
+        field[2][1] = X;
+        MiniMax.Result result = compute(field, O);
+        assertThat(result.getScore()).isEqualTo(10);
+        assertThat(result.getCell()).isEqualTo(new Main.Cell(0, 2));
     }
 
     @Test
@@ -25,7 +69,7 @@ public class MiniMaxTest {
                 {X, 0, X},
                 {0, O, O},
         };
-        assertThat(MiniMax.compute(field, X, MiniMax.MIN)).isEqualTo(-10);
+        assertThat(compute(field, X, MiniMax.MIN).getScore()).isEqualTo(-10);
     }
 
     @Test
@@ -35,8 +79,8 @@ public class MiniMaxTest {
                 {X, 0, X},
                 {X, O, O},
         };
-        assertThat(MiniMax.compute(field, X, MiniMax.MIN)).isEqualTo(-10);
-        assertThat(MiniMax.compute(field, X, MiniMax.MAX)).isEqualTo(10);
+        assertThat(compute(field, X, MiniMax.MIN).getScore()).isEqualTo(-10);
+        assertThat(compute(field, X, MiniMax.MAX).getScore()).isEqualTo(10);
     }
 
 }
