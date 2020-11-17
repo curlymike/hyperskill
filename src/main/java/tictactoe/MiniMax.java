@@ -19,24 +19,24 @@ public enum MiniMax {
 
     public static Result compute(int[][] field, int player, MiniMax miniMax, int depth) {
         Cell cell = null;
-        int maxScoreValue = Integer.MIN_VALUE;
+        int largestScoreValue = miniMax == MAX ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         for (Cell freeCell : freeCells(field)) {
             int value;
             field[freeCell.y][freeCell.x] = player;
             if (isWinner(field, player) > 0) {
-                value = 10;
+                value = miniMax == MAX ? 10 : -10;
             } else if (!hasFreeCells(field)) {
                 value = 0;
             } else {
                 value = compute(field, opponent(player), inverse(miniMax), depth + 1).score;
             }
-            if (value > maxScoreValue) {
-                maxScoreValue = value;
+            if (miniMax == MAX && value > largestScoreValue || miniMax == MIN && value < largestScoreValue) {
+                largestScoreValue = value;
                 cell = freeCell;
             }
             field[freeCell.y][freeCell.x] = 0;
         }
-        return new Result(miniMax == MAX ? maxScoreValue : -maxScoreValue, cell);
+        return new Result(largestScoreValue, cell);
     }
 
     private static MiniMax inverse(MiniMax miniMax) {
