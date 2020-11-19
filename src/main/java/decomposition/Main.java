@@ -24,7 +24,6 @@ public class Main {
 //        System.out.println("------------");
     }
 
-    // Do I even need "cap" here?
     public static List<String> decomp(int cap, int n) {
         List<String> output = new ArrayList<>();
         if (n > 1) {
@@ -33,11 +32,12 @@ public class Main {
                     StringBuilder sb = new StringBuilder();
                     output.add(sb.append(i).append(' ').append(str).toString());
                 }
+                if (n - i == 0) {
+                    output.add(String.valueOf(n));
+                }
             }
         } else if (n == 1) {
             output.add("1");
-        } else {
-            output.add(String.valueOf(n));
         }
         return output;
     }
