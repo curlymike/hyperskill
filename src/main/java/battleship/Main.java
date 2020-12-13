@@ -19,6 +19,15 @@ public class Main {
         print(field);
     }
 
+    public static void placeShipsQuick(GameField field) {
+        field.reset(); // just in case
+        field.placeShip("F3", "F7", -1);
+        field.placeShip("A1", "D1", -1);
+        field.placeShip("J10", "J8", -1);
+        field.placeShip("B9", "D9", -1);
+        field.placeShip("I2", "J2", -1);
+    }
+
     public static void placeShips(GameField field) {
         for (ShipType shipType : ShipType.values()) {
             print(field);
@@ -27,6 +36,10 @@ public class Main {
             boolean success = false;
             while (!success) {
                 String coordPair = scanner.nextLine();
+                if ("***".equals(coordPair)) {
+                    placeShipsQuick(field);
+                    return;
+                }
                 try {
                     String[] coordsArr = parseCoords(coordPair);
                     field.placeShip(coordsArr[0], coordsArr[1], shipType.size());

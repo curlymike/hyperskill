@@ -24,6 +24,14 @@ public class GameField {
         this.height = height;
     }
 
+    public void reset() {
+        for (int y = 0; y < field.length; y++) {
+            for (int x = 0; x < field[y].length; x++) {
+                field[y][x] = 0;
+            }
+        }
+    }
+
     public void set(String coordinates, int value) {
         Coords coords = translate(coordinates);
         set(coords.x, coords.y, value);
@@ -42,7 +50,7 @@ public class GameField {
         }
         // this throws InvalidCoordinatesException is coords are skewed
         int length = computeLength(begin, end);
-        if (length != expectedLength) {
+        if (expectedLength != -1 && length != expectedLength) {
             throw new InvalidShipLengthException();
         }
         if (!isFree(begin, end)) {
