@@ -39,6 +39,8 @@ public class Main {
                 System.out.println("Error! You entered the wrong coordinates! Try again:");
             }
         }
+        System.out.println();
+        print(field);
     }
 
     public static void placeShipsQuick(GameField field) {
@@ -84,16 +86,16 @@ public class Main {
         }
     }
 
-    public static void print(GameField field) {
-        System.out.println(asString(field));
-    }
-
     private static String[] parseCoords(String coordPair) {
         Matcher m = coordPairPattern.matcher(coordPair);
         if (!m.matches()) {
             throw new IllegalArgumentException();
         }
         return new String[]{m.group(1), m.group(2)};
+    }
+
+    public static void print(GameField field) {
+        System.out.println(asString(field));
     }
 
     public static String asString(GameField field) {
@@ -109,7 +111,13 @@ public class Main {
         for (int y = 0; y < field.width(); y++) {
             sb.append(letters[y]).append(' ');
             for (int x = 0; x < field.height(); x++) {
-                sb.append(gameField[y][x] == 0 ? '~' : 'O').append(' ');
+                switch (gameField[y][x]) {
+                    case GameField.FREE: sb.append('~'); break;
+                    case GameField.SHIP: sb.append('O'); break;
+                    case GameField.HIT: sb.append('X'); break;
+                    case GameField.MISS: sb.append('M'); break;
+                }
+                sb.append(' ');
             }
             sb.append('\n');
         }

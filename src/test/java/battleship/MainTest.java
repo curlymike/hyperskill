@@ -13,16 +13,6 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 public class MainTest {
 
     @Test
-    public void experiment() {
-        int a = 'A';
-        int b = 'B';
-        System.out.println(a + ", " + b);
-
-//        int[] arr = new int[10];
-//        arr[-1] = 1;
-    }
-
-    @Test
     public void parseCoords_001() throws Exception {
         Method parseCoords = Main.class.getDeclaredMethod("parseCoords", String.class);
         parseCoords.setAccessible(true);
