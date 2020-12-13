@@ -11,6 +11,12 @@ public class GameField {
     private static final int DEFAULT_SIZE = 10;
     private static final int ASCII_OFFSET = 64;
     private static final Pattern coordPattern = Pattern.compile("^([A-Z]{1})([0-9]+)$");
+
+    public static final int FREE = 0;
+    public static final int SHIP = 1;
+    public static final int HIT = 2;
+    public static final int MISS = 3;
+
     private final int[][] field = new int[DEFAULT_SIZE][DEFAULT_SIZE];
     private final int width;
     private final int height;
@@ -32,10 +38,19 @@ public class GameField {
         }
     }
 
-    public void set(String coordinates, int value) {
+    /**
+     * Fire at the field
+     * @param coordinates
+     * @return boolean indicating hit (true) or miss (false)
+     * @throws InvalidCoordinatesException in case invalid or out of bounds coordinates were given
+     */
+
+    public int fire(String coordinates) {
         Coords coords = translate(coordinates);
-        set(coords.x, coords.y, value);
+        set(coords, get(coords) == SHIP ? HIT : MISS);
+        return get(coords);
     }
+
     // Wrong length of the Submarine (if not vertical, horizontal, or wrong length)
     // Wrong ship location
     // You placed it too close to another one
@@ -137,6 +152,37 @@ public class GameField {
 //        return coordLength + 1 == length && validCoordinates(begin) && validCoordinates(end);
 //    }
 
+    /**
+     *
+     * @param coordinates
+     * @param value
+     * @throws IllegalArgumentException in case given coordinates are out of bounds
+     */
+
+    public void set(String coordinates, int value) {
+        Coords coords = translate(coordinates);
+        set(coords, value);
+    }
+
+    /**
+     *
+     * @param coords
+     * @param value
+     * @throws IllegalArgumentException in case given coordinates are out of bounds
+     */
+
+    public void set(Coords coords, int value) {
+        set(coords.x, coords.y, value);
+    }
+
+    /**
+     *
+     * @param x
+     * @param y
+     * @param value
+     * @throws IllegalArgumentException in case given coordinates are out of bounds
+     */
+
     private void set(int x, int y, int value) {
         try {
             field[y - 1][x - 1] = value;
@@ -144,6 +190,13 @@ public class GameField {
             throw new IllegalArgumentException();
         }
     }
+
+    /**
+     *
+     * @param coords
+     * @return
+     * @throws IllegalArgumentException
+     */
 
     private Coords translate(String coords) {
         Matcher m = coordPattern.matcher(coords);
@@ -159,8 +212,31 @@ public class GameField {
         return letter - ASCII_OFFSET;
     }
 
-    public int get(int x, int y) {
-        return field[y][x];
+    /**
+     *
+     * @param coords
+     * @return
+     * @throws ArrayIndexOutOfBoundsException
+     */
+
+    private int get(Coords coords) {
+        try {
+            return get(coords.x, coords.y);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    /**
+     *
+     * @param x
+     * @param y
+     * @return
+     * @throws ArrayIndexOutOfBoundsException
+     */
+
+    private int get(int x, int y) {
+        return field[y - 1][x - 1];
     }
 
     public int width() {

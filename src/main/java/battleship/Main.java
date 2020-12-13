@@ -17,6 +17,28 @@ public class Main {
         scanner = new Scanner(System.in);
         placeShips(field);
         print(field);
+        startGame(field);
+    }
+
+    public static void startGame(GameField field) {
+        System.out.println("The game starts!");
+        System.out.println();
+        print(field);
+        System.out.println("Take a shot!");
+        boolean success = false;
+        while (!success) {
+            String coordinates = scanner.nextLine();
+            try {
+                if (field.fire(coordinates) == GameField.HIT) {
+                    System.out.println("You hit a ship!");
+                } else {
+                    System.out.println("You missed!");
+                }
+                success = true;
+            } catch (IllegalArgumentException e) {
+                System.out.println("Error! You entered the wrong coordinates! Try again:");
+            }
+        }
     }
 
     public static void placeShipsQuick(GameField field) {
