@@ -41,7 +41,7 @@ public class GameField {
     /**
      * Fire at the field
      * @param coordinates
-     * @return boolean indicating hit (true) or miss (false)
+     * @return int indicating hit or miss (see the constants at the top of the class)
      * @throws InvalidCoordinatesException in case invalid or out of bounds coordinates were given
      */
 

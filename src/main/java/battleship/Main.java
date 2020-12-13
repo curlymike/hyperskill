@@ -23,21 +23,28 @@ public class Main {
     public static void startGame(GameField field) {
         System.out.println("The game starts!");
         System.out.println();
-        print(field);
+        print(field, true);
         System.out.println("Take a shot!");
         boolean success = false;
+        int result = -1;
         while (!success) {
             String coordinates = scanner.nextLine();
             try {
-                if (field.fire(coordinates) == GameField.HIT) {
-                    System.out.println("You hit a ship!");
-                } else {
-                    System.out.println("You missed!");
-                }
+                result = field.fire(coordinates);
                 success = true;
             } catch (IllegalArgumentException e) {
                 System.out.println("Error! You entered the wrong coordinates! Try again:");
             }
+        }
+        System.out.println();
+        print(field, true);
+        switch (result) {
+            case GameField.HIT:
+                System.out.println("You hit a ship!");
+                break;
+            case GameField.MISS:
+                System.out.println("You missed!");
+                break;
         }
         System.out.println();
         print(field);
@@ -95,10 +102,18 @@ public class Main {
     }
 
     public static void print(GameField field) {
-        System.out.println(asString(field));
+        print(field, false);
+    }
+
+    public static void print(GameField field, boolean fogged) {
+        System.out.println(asString(field, fogged));
     }
 
     public static String asString(GameField field) {
+        return asString(field, false);
+    }
+
+    public static String asString(GameField field, boolean fogged) {
         char[] letters = new char[]{'A','B','C','D','E','F','G','H','I','J'};
         int[][] gameField = field.getField();
         StringBuilder sb = new StringBuilder();
@@ -113,7 +128,7 @@ public class Main {
             for (int x = 0; x < field.height(); x++) {
                 switch (gameField[y][x]) {
                     case GameField.FREE: sb.append('~'); break;
-                    case GameField.SHIP: sb.append('O'); break;
+                    case GameField.SHIP: sb.append(fogged ? '~' : 'O'); break;
                     case GameField.HIT: sb.append('X'); break;
                     case GameField.MISS: sb.append('M'); break;
                 }
