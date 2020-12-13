@@ -16,13 +16,14 @@ public class Main {
     public static void main(String[] args) {
         scanner = new Scanner(System.in);
         placeShips(field);
+        print(field);
     }
 
     public static void placeShips(GameField field) {
         for (ShipType shipType : ShipType.values()) {
             print(field);
             System.out.printf("Enter the coordinates of the %s (%d cells):%n", shipType.getName(), shipType.size());
-            System.out.print("> ");
+            //System.out.print("> ");
             boolean success = false;
             while (!success) {
                 String coordPair = scanner.nextLine();
@@ -30,18 +31,19 @@ public class Main {
                     String[] coordsArr = parseCoords(coordPair);
                     field.placeShip(coordsArr[0], coordsArr[1], shipType.size());
                     success = true;
+                    System.out.println();
                 } catch (IllegalArgumentException e) {
                     System.out.println("Error! Invalid input! Try again:");
-                    System.out.print("> ");
+                    //System.out.print("> ");
                 } catch (InvalidCoordinatesException e) {
                     System.out.println("Error! Wrong ship location! Try again:");
-                    System.out.print("> ");
+                    //System.out.print("> ");
                 } catch (InvalidShipLengthException e) {
                     System.out.printf("Error! Wrong length of the %s! Try again:%n", shipType.getName());
-                    System.out.print("> ");
+                    //System.out.print("> ");
                 } catch (AreaIsTakenException e) {
                     System.out.println("Error! You placed it too close to another one. Try again:");
-                    System.out.print("> ");
+                    //System.out.print("> ");
                 }
             }
         }
