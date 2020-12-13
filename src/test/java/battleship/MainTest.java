@@ -23,6 +23,14 @@ public class MainTest {
     }
 
     @Test
+    public void parseCoords_001() throws Exception {
+        Method parseCoords = Main.class.getDeclaredMethod("parseCoords", String.class);
+        parseCoords.setAccessible(true);
+        String[] result = (String[]) parseCoords.invoke(null, "A1 A3");
+        assertThat(result).isEqualTo(new String[]{"A1","A3"});
+    }
+
+    @Test
     public void asString_001() {
         GameField field = new GameField();
         String expected = "  1 2 3 4 5 6 7 8 9 10\n" +
