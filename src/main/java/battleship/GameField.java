@@ -53,7 +53,8 @@ public class GameField implements Iterable {
 
     public int fire(String coordinates) {
         Coords coords = translate(coordinates);
-        set(coords, get(coords) == SHIP ? HIT : MISS);
+        int currentValue = get(coords);
+        set(coords, (currentValue == SHIP || currentValue == HIT) ? HIT : MISS);
         return get(coords) == HIT ? (isSunk(coords) ? RESULT_HIT_AND_SUNK : RESULT_HIT) : RESULT_MISS;
     }
 
