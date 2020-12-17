@@ -6,11 +6,34 @@ import battleship.exceptions.InvalidShipLengthException;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
+import java.util.Iterator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
 public class MainTest {
+
+    @Test
+    public void fieldIterator_001() throws Exception {
+        GameField field = new GameField(10, 10);
+        field.set("A1", GameField.SHIP);
+        field.set("J10", GameField.SHIP);
+        Iterator<Integer> iter = field.iterator();
+        int n = 0;
+        int countShip = 0;
+        int[] indx = new int[2];
+        while (iter.hasNext()) {
+            int value = iter.next();
+            if (value == GameField.SHIP) {
+                indx[countShip] = n;
+                countShip++;
+            }
+            n++;
+        }
+        assertThat(n).isEqualTo(100);
+        assertThat(countShip).isEqualTo(2);
+        assertThat(indx).isEqualTo(new int[]{0, 99});
+    }
 
     @Test
     public void parseCoords_001() throws Exception {

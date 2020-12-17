@@ -4,6 +4,7 @@ import battleship.exceptions.AreaIsTakenException;
 import battleship.exceptions.InvalidCoordinatesException;
 import battleship.exceptions.InvalidShipLengthException;
 
+import java.util.Iterator;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,29 +26,39 @@ public class Main {
         System.out.println();
         print(field, true);
         System.out.println("Take a shot!");
-        boolean success = false;
-        int result = -1;
-        while (!success) {
-            String coordinates = scanner.nextLine();
-            try {
-                result = field.fire(coordinates);
-                success = true;
-            } catch (IllegalArgumentException e) {
-                System.out.println("Error! You entered the wrong coordinates! Try again:");
+        while (!isAllShipSunk(field)) {
+            boolean success = false;
+            int result = -1;
+
+            while (!success) {
+                String coordinates = scanner.nextLine();
+                try {
+                    result = field.fire(coordinates);
+                    success = true;
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Error! You entered the wrong coordinates! Try again:");
+                }
             }
+            System.out.println();
+            print(field, true);
+            switch (result) {
+                case GameField.RESULT_HIT:
+                case GameField.RESULT_HIT_AND_SUNK:
+                    if (isAllShipSunk(field)) {
+                        System.out.println("You sank the last ship. You won. Congratulations!");
+                    } else if (result == GameField.RESULT_HIT_AND_SUNK) {
+                        System.out.println("You sank a ship! Specify a new target:");
+                    } else {
+                        System.out.println("You hit a ship! Try again:");
+                    }
+                    break;
+                case GameField.RESULT_MISS:
+                    System.out.println("You missed!");
+                    break;
+            }
+            System.out.println();
+            //print(field);
         }
-        System.out.println();
-        print(field, true);
-        switch (result) {
-            case GameField.HIT:
-                System.out.println("You hit a ship!");
-                break;
-            case GameField.MISS:
-                System.out.println("You missed!");
-                break;
-        }
-        System.out.println();
-        print(field);
     }
 
     public static void placeShipsQuick(GameField field) {
@@ -55,6 +66,15 @@ public class Main {
         field.placeShip("F3", "F7", -1);
         field.placeShip("A1", "D1", -1);
         field.placeShip("J10", "J8", -1);
+        field.placeShip("B9", "D9", -1);
+        field.placeShip("I2", "J2", -1);
+    }
+    public static void placeShipsQuicker(GameField field) {
+        field.reset(); // just in case
+        field.placeShip("I2", "J2", -1);
+    }
+    public static void placeShipsQuicker2(GameField field) {
+        field.reset(); // just in case
         field.placeShip("B9", "D9", -1);
         field.placeShip("I2", "J2", -1);
     }
@@ -69,6 +89,12 @@ public class Main {
                 String coordPair = scanner.nextLine();
                 if ("***".equals(coordPair)) {
                     placeShipsQuick(field);
+                    return;
+                } else if ("****".equals(coordPair)) {
+                    placeShipsQuicker(field);
+                    return;
+                } else if ("*****".equals(coordPair)) {
+                    placeShipsQuicker2(field);
                     return;
                 }
                 try {
@@ -91,6 +117,18 @@ public class Main {
                 }
             }
         }
+    }
+
+    public static boolean isAllShipSunk(GameField gameField) {
+        int[][] field = gameField.getField();
+        Iterator<Integer> iter = gameField.iterator();
+        int shipCellCount = 0;
+        while (iter.hasNext()) {
+            if (iter.next() == GameField.SHIP) {
+                shipCellCount++;
+            }
+        }
+        return shipCellCount == 0;
     }
 
     private static String[] parseCoords(String coordPair) {

@@ -4,10 +4,11 @@ import battleship.exceptions.AreaIsTakenException;
 import battleship.exceptions.InvalidCoordinatesException;
 import battleship.exceptions.InvalidShipLengthException;
 
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class GameField {
+public class GameField implements Iterable {
     private static final int DEFAULT_SIZE = 10;
     private static final int ASCII_OFFSET = 64;
     private static final Pattern coordPattern = Pattern.compile("^([A-Z]{1})([0-9]+)$");
@@ -15,9 +16,14 @@ public class GameField {
     public static final int FREE = 0;
     public static final int SHIP = 1;
     public static final int HIT = 2;
-    public static final int MISS = 3;
+    public static final int MISS = 4;
+
+    public static final int RESULT_HIT = 1;
+    public static final int RESULT_HIT_AND_SUNK = 2;
+    public static final int RESULT_MISS = 3;
 
     private final int[][] field = new int[DEFAULT_SIZE][DEFAULT_SIZE];
+    private final List<Ship> ships = new ArrayList<>();
     private final int width;
     private final int height;
 
@@ -48,7 +54,24 @@ public class GameField {
     public int fire(String coordinates) {
         Coords coords = translate(coordinates);
         set(coords, get(coords) == SHIP ? HIT : MISS);
-        return get(coords);
+        return get(coords) == HIT ? (isSunk(coords) ? RESULT_HIT_AND_SUNK : RESULT_HIT) : RESULT_MISS;
+    }
+
+    private boolean isSunk(Coords coords) {
+        Ship ship = findShipByCoords(coords);
+        if (ship != null && ship.isSunk()) {
+            return true;
+        }
+        return false;
+    }
+
+    private Ship findShipByCoords(Coords coords) {
+        for (Ship ship : ships) {
+            if (ship.hasCoords(coords)) {
+                return ship;
+            }
+        }
+        return null;
     }
 
     // Wrong length of the Submarine (if not vertical, horizontal, or wrong length)
@@ -71,7 +94,7 @@ public class GameField {
         if (!isFree(begin, end)) {
             throw new AreaIsTakenException();
         }
-        setRange(begin, end, 1);
+        ships.add(new Ship(this, setRange(begin, end, 1)));
     }
 
     /**
@@ -98,7 +121,8 @@ public class GameField {
         return true;
     }
 
-    private void setRange(Coords begin, Coords end, int value) {
+    private Collection<Coords> setRange(Coords begin, Coords end, int value) {
+        List<Coords> shipCoords = new ArrayList<>();
         int y1 = begin.y < end.y ? begin.y : end.y;
         int y2 = begin.y >= end.y ? begin.y : end.y;
         int x1 = begin.x < end.x ? begin.x : end.x;
@@ -106,8 +130,10 @@ public class GameField {
         for (int y = y1; y <= y2; y++) {
             for (int x = x1; x <= x2; x++) {
                 set(x, y, value);
+                shipCoords.add(new Coords(x, y));
             }
         }
+        return shipCoords;
     }
 
     private boolean validCoordinates(Coords coords) {
@@ -258,11 +284,47 @@ public class GameField {
         return field;
     }
 
+    @Override
+    public java.util.Iterator iterator() {
+        return new Iterator();
+    }
+
     /**
      *
      *
      *
      */
+
+    class Iterator implements java.util.Iterator<Integer> {
+        private int y = 0;
+        private int x = -1;
+        private int lastY = field.length - 1;
+        private int lastX = field[lastY].length - 1;
+
+        @Override
+        public boolean hasNext() {
+            return !(y == lastY && x == lastX);
+        }
+
+        @Override
+        public Integer next() {
+            try {
+                advance();
+                return field[y][x];
+            } catch (ArrayIndexOutOfBoundsException e) {
+                throw new NoSuchElementException();
+            }
+        }
+
+        private void advance() {
+            x++;
+            if (x == field[y].length && y < lastY) {
+                x = 0;
+                y++;
+            }
+        }
+
+    }
 
     static class Coords {
         final int x;
@@ -299,4 +361,29 @@ public class GameField {
                     '}';
         }
     }
+
+    private static class Ship {
+        private final GameField gameField;
+        private final Collection<GameField.Coords> shipCoords;
+
+        public Ship(GameField gameField, Collection<GameField.Coords> shipCoords) {
+            this.gameField = gameField;
+            this.shipCoords = shipCoords;
+        }
+
+        public boolean hasCoords(GameField.Coords coords) {
+            return shipCoords.contains(coords);
+        }
+
+        public boolean isSunk() {
+            for (GameField.Coords coords : shipCoords) {
+                if (gameField.get(coords) != GameField.HIT) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+    }
+
 }
